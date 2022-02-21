@@ -70,7 +70,7 @@ def downloadFile(url ,path):
             if chunk:
                 f.write(chunk)
 
-# 主窗口
+# 关于我们
 class About(QWidget):
     def __init__(self):
         super().__init__()
