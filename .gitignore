@@ -1,3 +1,10 @@
+# BingLocalNetChat
+config.ini
+config.yml
+test.py
+.idea/
+cache/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
