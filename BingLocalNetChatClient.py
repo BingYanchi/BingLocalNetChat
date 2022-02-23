@@ -94,7 +94,7 @@ class MainWindow(QMainWindow):
         self.ui.setWindowTitle("冰氏局域网去中心化聊天系统 - 客户端 - v1.0")
 
         self.ui.actionSetUserName.triggered.connect(self.setUserName)
-        self.ui.actionChannelConnect.triggered.connect(self.changeChannel)
+        #self.ui.actionChannelConnect.triggered.connect(self.changeChannel)
         self.ui.actionExit.triggered.connect(self.exitClient)
         self.ui.actionAbout.triggered.connect(self.openAbout)
         self.ui.actionClearChat.triggered.connect(self.clearChat)
@@ -243,6 +243,8 @@ class Listener:
 
     # 获取到数据时的操作
     def run(self):
+        lastData = {}
+
         while True:
             rawData, address = self.s.recvfrom(65535)
             data = eval(rawData)
@@ -253,11 +255,16 @@ class Listener:
                 #time.sleep(0.2)
                 continue
 
+            # 临时解决重复接收
+            if lastData == data: continue
+            else: lastData = data
+
             # 显示
             if data['type'] == 'msg':
                 main.ui.textBrowser.append('')
-                main.ui.textBrowser.append('<b>[{}] {}({}):</b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
-                main.ui.textBrowser.append(data['text'])
+                main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
+                for line in data['text'].split('\n'):
+                    main.ui.textBrowser.append('<font color="#000000">{}</font>'.format(line))
                 main.ui.textBrowser.ensureCursorVisible()
 
                 # Win10 推送
@@ -269,7 +276,7 @@ class Listener:
 
                 # 输出文本
                 main.ui.textBrowser.append('')
-                main.ui.textBrowser.append('<b>[{}] {}({}):</b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
+                main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
                 main.ui.textBrowser.append('<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(file=data['file'], path=os.getcwd()))
                 main.ui.textBrowser.ensureCursorVisible()
 
@@ -280,7 +287,7 @@ class Listener:
                 main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format('[系统] 用户 {}({}) 进入了此频道'.format(data['username'], address[0])))
                 main.ui.textBrowser.ensureCursorVisible()
 
-            elif data['type'] == 'exit':
+            elif data['type'] == 'quit':
                 main.ui.textBrowser.append('')
                 main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format('[系统] 用户 {}({}) 离开了此频道'.format(data['username'], address[0])))
                 main.ui.textBrowser.ensureCursorVisible()
@@ -291,6 +298,13 @@ class Listener:
             toaster.show_toast(title, message, icon_path="logo.ico", threaded = True, duration = None)
         except:
             print("[警告] 发送 Windows 消息出错")
+
+# win10 通知出错时提示的窗口
+class MsgNotice(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.ui = QUiLoader().load('style/MsgNotice.ui')
+        self.ui.setWindowTitle("关于 冰氏局域网去中心化聊天系统")
 
 # 文件传输服务
 class Handler(SimpleHTTPRequestHandler):
