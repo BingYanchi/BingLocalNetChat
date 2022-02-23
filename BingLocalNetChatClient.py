@@ -2,6 +2,7 @@
 # 作者注: 只是原则上的去中心化, 实际上一旦掌握密钥就可以通过客户端的一些后门进行控制
 
 # 库导入
+from PySide2.QtCore import QEvent, Qt
 from PySide2.QtWidgets import QApplication, QMessageBox, QInputDialog, QLineEdit, QMainWindow, QWidget
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtGui import  QIcon, QFontDatabase, QPixmap
@@ -91,7 +92,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = QUiLoader().load('style/MainWindow.ui')
         # Alpha
-        self.ui.setWindowTitle("冰氏局域网去中心化聊天系统 - 客户端 - v1.1 Alpha")
+        self.ui.setWindowTitle("冰氏局域网去中心化聊天系统 - 客户端 - v1.1")
 
         self.ui.actionSetUserName.triggered.connect(self.setUserName)
         #self.ui.actionChannelConnect.triggered.connect(self.changeChannel)
@@ -100,6 +101,8 @@ class MainWindow(QMainWindow):
         self.ui.actionClearChat.triggered.connect(self.clearChat)
 
         self.ui.textBrowser.anchorClicked.connect(self.clickURL)
+
+        self.ui.sendText.installEventFilter(self)
 
         # 发送按钮
         self.ui.sendButton.clicked.connect(self.sendMsg)
@@ -126,11 +129,11 @@ class MainWindow(QMainWindow):
             self.ui.sendText.clear()
 
             # 提交一份自己的
-            main.ui.textBrowser.append('')
-            main.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format('[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
+            self.ui.textBrowser.append('')
+            self.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format('[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
             for line in data['text'].split('\n'):
-                main.ui.textBrowser.append('<font color="#4CAF50">{}</font>'.format(line))
-            main.ui.textBrowser.ensureCursorVisible()
+                self.ui.textBrowser.append('<font color="#4CAF50">{}</font>'.format(line))
+            self.ui.textBrowser.ensureCursorVisible()
         except:
             QMessageBox.critical(self.ui, '错误', '发送信息错误')
 
@@ -145,12 +148,22 @@ class MainWindow(QMainWindow):
             data = {'username': yamlConfig.getConfig()['username'], 'type':'img', 'port':config.config['common']['file_port'], 'file':'{}.jpg'.format(fileName)}
             sender.sendMsg(data)
 
-            main.ui.textBrowser.append('')
-            main.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format('[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
-            main.ui.textBrowser.append('<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(file=str(fileName) + '.jpg', path=os.getcwd()))
-            main.ui.textBrowser.ensureCursorVisible()
+            self.ui.textBrowser.append('')
+            self.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format('[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
+            self.ui.textBrowser.append('<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(file=str(fileName) + '.jpg', path=os.getcwd()))
+            self.ui.textBrowser.ensureCursorVisible()
         except:
             QMessageBox.critical(self.ui, '错误', '发送屏幕截图错误')
+
+    # 回车按键
+    def eventFilter(self, widget, event):
+        if self.ui.returnSend.isChecked():
+            # 判断事件类型是否是键盘事件
+            if event.type() == QEvent.KeyPress:
+                # 判断是否是回车
+                if event.key() == Qt.Key_Return:
+                    self.sendMsg()
+        return QWidget.eventFilter(self, widget, event)
 
     # 设置昵称
     def setUserName(self):
