@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = QUiLoader().load('style/MainWindow.ui')
         # Alpha
-        self.ui.setWindowTitle("冰氏局域网去中心化聊天系统 - 客户端 - v1.0")
+        self.ui.setWindowTitle("冰氏局域网去中心化聊天系统 - 客户端 - v1.1 Alpha")
 
         self.ui.actionSetUserName.triggered.connect(self.setUserName)
         #self.ui.actionChannelConnect.triggered.connect(self.changeChannel)
@@ -265,7 +265,6 @@ class Listener:
                 main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
                 for line in data['text'].split('\n'):
                     main.ui.textBrowser.append('<font color="#000000">{}</font>'.format(line))
-                main.ui.textBrowser.ensureCursorVisible()
 
                 # Win10 推送
                 self.sendWindowsMessage("你收到了来自 {}({}) 的信息".format(data['username'], address[0]), data['text'])
@@ -278,19 +277,18 @@ class Listener:
                 main.ui.textBrowser.append('')
                 main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
                 main.ui.textBrowser.append('<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(file=data['file'], path=os.getcwd()))
-                main.ui.textBrowser.ensureCursorVisible()
 
                 # Win10 推送
                 self.sendWindowsMessage("你收到了来自 {}({}) 的信息".format(data['username'], address[0]), '[屏幕截图]')
             elif data['type'] == 'join':
                 main.ui.textBrowser.append('')
                 main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format('[系统] 用户 {}({}) 进入了此频道'.format(data['username'], address[0])))
-                main.ui.textBrowser.ensureCursorVisible()
 
             elif data['type'] == 'quit':
                 main.ui.textBrowser.append('')
                 main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format('[系统] 用户 {}({}) 离开了此频道'.format(data['username'], address[0])))
-                main.ui.textBrowser.ensureCursorVisible()
+
+            main.ui.textBrowser.ensureCursorVisible()
 
     # Windows 10 消息
     def sendWindowsMessage(self, title, message):
