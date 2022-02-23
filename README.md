@@ -1,6 +1,8 @@
 # BingLocalNetChat
 冰氏局域网去中心化聊天系统
 
+![主页面](https://s2.loli.net/2022/02/23/Jxsfl3DjQY4ITLn.png)
+
 ## 环境
 
 - 推荐 Python 版本：3.10.2
