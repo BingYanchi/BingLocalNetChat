@@ -125,6 +125,13 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QCheckBox" name="returnSend">
+          <property name="text">
+           <string>回车键发送</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
