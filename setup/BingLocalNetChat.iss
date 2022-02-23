@@ -2,7 +2,7 @@
 ; 有关创建 Inno Setup 脚本文件的详细资料请查阅帮助文档！
 
 #define MyAppName "冰氏局域网去中心化聊天系统"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1"
 #define MyAppPublisher "冰砚炽"
 #define MyAppURL "https://www.yistars.cn/"
 #define MyAppExeName "BingLocalNetChatClient.exe"
