@@ -4,6 +4,7 @@ config.yml
 test.py
 .idea/
 cache/
+setup/BingLocalNetChat.exe
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
