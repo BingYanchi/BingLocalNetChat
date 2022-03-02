@@ -5,14 +5,15 @@
 from PySide2.QtCore import QEvent, Qt
 from PySide2.QtWidgets import QApplication, QMessageBox, QInputDialog, QLineEdit, QMainWindow, QWidget
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtGui import  QIcon, QFontDatabase, QPixmap
+from PySide2.QtGui import QIcon, QFontDatabase, QPixmap
 from threading import Thread
 from win10toast_click import ToastNotifier
 from PIL import ImageGrab
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
-import socket,time,sys,configparser,os,uuid,wget,requests,yaml
+import socket, time, sys, configparser, os, uuid, wget, requests, yaml
 
 localHost = ''
+
 
 # INI 配置文件
 class Config:
@@ -35,6 +36,7 @@ class Config:
         self.config.set(section, option, value)
         self.config.write(open(self.file, "w", encoding="utf-8"))
         self.config.read(self.file)
+
 
 # YAML 配置文件
 class YamlConfig:
@@ -61,15 +63,17 @@ class YamlConfig:
         with open(self.file, 'r', encoding="utf-8") as f:
             self.config = f.read()
 
+
 # 下载文件
-def downloadFile(url ,path):
+def downloadFile(url, path):
     wget.download(url, path)
-    
+
     r = requests.get(url, stream=True)
     with open(path, "wb") as f:
         for chunk in r.iter_content(chunk_size=1024):  # 1024 bytes
             if chunk:
                 f.write(chunk)
+
 
 # 关于我们
 class About(QWidget):
@@ -86,6 +90,7 @@ class About(QWidget):
     def clickURL(self, url):
         os.startfile(url.toString())
 
+
 # 主窗口
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -95,7 +100,7 @@ class MainWindow(QMainWindow):
         self.ui.setWindowTitle("冰氏局域网去中心化聊天系统 - 客户端 - v1.1")
 
         self.ui.actionSetUserName.triggered.connect(self.setUserName)
-        #self.ui.actionChannelConnect.triggered.connect(self.changeChannel)
+        # self.ui.actionChannelConnect.triggered.connect(self.changeChannel)
         self.ui.actionExit.triggered.connect(self.exitClient)
         self.ui.actionAbout.triggered.connect(self.openAbout)
         self.ui.actionClearChat.triggered.connect(self.clearChat)
@@ -114,7 +119,7 @@ class MainWindow(QMainWindow):
                 title, okPressed = QInputDialog.getText(self, "填写昵称", "设置你的昵称为：", QLineEdit.Normal, "")
 
                 if okPressed and title != "":
-                    #config.writeConfig("common", "username", title)
+                    # config.writeConfig("common", "username", title)
                     yamlConfig.writeConfig('username', title)
                     break
 
@@ -124,13 +129,15 @@ class MainWindow(QMainWindow):
             # 如果为空则不发送
             if self.ui.sendText.toPlainText() == "": return
 
-            data = {'username': yamlConfig.getConfig()['username'], 'type':'msg', 'text':self.ui.sendText.toPlainText()}
+            data = {'username': yamlConfig.getConfig()['username'], 'type': 'msg',
+                    'text': self.ui.sendText.toPlainText()}
             sender.sendMsg(data)
             self.ui.sendText.clear()
 
             # 提交一份自己的
             self.ui.textBrowser.append('')
-            self.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format('[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
+            self.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format(
+                '[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
             for line in data['text'].split('\n'):
                 self.ui.textBrowser.append('<font color="#4CAF50">{}</font>'.format(line))
             self.ui.textBrowser.ensureCursorVisible()
@@ -145,12 +152,16 @@ class MainWindow(QMainWindow):
         im.save('cache/{}.jpg'.format(fileID), 'jpeg')
 
         try:
-            data = {'username': yamlConfig.getConfig()['username'], 'type':'img', 'port':config.config['common']['file_port'], 'file':'{}.jpg'.format(fileName)}
+            data = {'username': yamlConfig.getConfig()['username'], 'type': 'img',
+                    'port': config.config['common']['file_port'], 'file': '{}.jpg'.format(fileName)}
             sender.sendMsg(data)
 
             self.ui.textBrowser.append('')
-            self.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format('[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
-            self.ui.textBrowser.append('<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(file=str(fileName) + '.jpg', path=os.getcwd()))
+            self.ui.textBrowser.append('<b><font color="#4CAF50">{}</font></b>'.format(
+                '[{}] 你:'.format(time.strftime("%H:%M:%S", time.localtime()))))
+            self.ui.textBrowser.append(
+                '<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(
+                    file=str(fileName) + '.jpg', path=os.getcwd()))
             self.ui.textBrowser.ensureCursorVisible()
         except:
             QMessageBox.critical(self.ui, '错误', '发送屏幕截图错误')
@@ -167,7 +178,8 @@ class MainWindow(QMainWindow):
 
     # 设置昵称
     def setUserName(self):
-        title, okPressed = QInputDialog.getText(self, "填写昵称", "设置你的昵称为：", QLineEdit.Normal, yamlConfig.getConfig()['username'])
+        title, okPressed = QInputDialog.getText(self, "填写昵称", "设置你的昵称为：", QLineEdit.Normal,
+                                                yamlConfig.getConfig()['username'])
 
         if okPressed and title == "":
             QMessageBox.critical(self.ui, '警告', '昵称不可为空')
@@ -194,7 +206,8 @@ class MainWindow(QMainWindow):
 
             # 输出提示
             main.ui.textBrowser.append('')
-            main.ui.textBrowser.append('<b><font color="#F44336">{}</font></b>'.format('[提示] 你已成功将端口修改为 {}...'.format(nowChatChannel)))
+            main.ui.textBrowser.append(
+                '<b><font color="#F44336">{}</font></b>'.format('[提示] 你已成功将端口修改为 {}...'.format(nowChatChannel)))
             main.ui.textBrowser.ensureCursorVisible()
 
         elif okPressed:
@@ -218,6 +231,7 @@ class MainWindow(QMainWindow):
     def clickURL(self, url):
         os.startfile(url.toString())
 
+
 # 发送者 Sender
 class Sender:
     # 初始化时需要 username
@@ -231,11 +245,14 @@ class Sender:
         # 加入信息
         data = {'username': yamlConfig.getConfig()['username'], 'type': "join"}
         self.sendMsg(data)
+
     # 发送数据
     def sendMsg(self, data):
         self.s.sendto(str(data).encode("utf-8"), (self.network, self.port))
+
     def close(self):
         self.s.close()
+
     def changePort(self, port):
         # 离开信息
         data = {'username': yamlConfig.getConfig()['username'], 'type': "quit"}
@@ -245,6 +262,7 @@ class Sender:
         # 加入信息
         data = {'username': yamlConfig.getConfig()['username'], 'type': "join"}
         self.sendMsg(data)
+
 
 # 接收者 Listener
 class Listener:
@@ -265,17 +283,20 @@ class Listener:
 
             # 如果是本地发送的, 则忽略
             if address[0] == localHost:
-                #time.sleep(0.2)
+                # time.sleep(0.2)
                 continue
 
             # 临时解决重复接收
-            if lastData == data: continue
-            else: lastData = data
+            if lastData == data:
+                continue
+            else:
+                lastData = data
 
             # 显示
             if data['type'] == 'msg':
                 main.ui.textBrowser.append('')
-                main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
+                main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(
+                    time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
                 for line in data['text'].split('\n'):
                     main.ui.textBrowser.append('<font color="#000000">{}</font>'.format(line))
 
@@ -283,32 +304,39 @@ class Listener:
                 self.sendWindowsMessage("你收到了来自 {}({}) 的信息".format(data['username'], address[0]), data['text'])
             elif data['type'] == 'img':
                 # 下载
-                #wget.download('http://{}:{}/{}'.format(address[0], data['port'], data['file']), 'cache/{}'.format(data['file']))
-                downloadFile('http://{}:{}/{}'.format(address[0], data['port'], data['file']), 'cache/{}'.format(data['file']))
+                # wget.download('http://{}:{}/{}'.format(address[0], data['port'], data['file']), 'cache/{}'.format(data['file']))
+                downloadFile('http://{}:{}/{}'.format(address[0], data['port'], data['file']),
+                             'cache/{}'.format(data['file']))
 
                 # 输出文本
                 main.ui.textBrowser.append('')
-                main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
-                main.ui.textBrowser.append('<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(file=data['file'], path=os.getcwd()))
+                main.ui.textBrowser.append('<b><font color="#000000">[{}] {}({}):</font></b>'.format(
+                    time.strftime("%H:%M:%S", time.localtime()), data['username'], address[0]))
+                main.ui.textBrowser.append(
+                    '<a href="file:///{path}\cache\{file}"><img src="cache/{file}" width=500></a>'.format(
+                        file=data['file'], path=os.getcwd()))
 
                 # Win10 推送
                 self.sendWindowsMessage("你收到了来自 {}({}) 的信息".format(data['username'], address[0]), '[屏幕截图]')
             elif data['type'] == 'join':
                 main.ui.textBrowser.append('')
-                main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format('[系统] 用户 {}({}) 进入了此频道'.format(data['username'], address[0])))
+                main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format(
+                    '[系统] 用户 {}({}) 进入了此频道'.format(data['username'], address[0])))
 
             elif data['type'] == 'quit':
                 main.ui.textBrowser.append('')
-                main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format('[系统] 用户 {}({}) 离开了此频道'.format(data['username'], address[0])))
+                main.ui.textBrowser.append('<b><font color="#3F51B5">{}</font></b>'.format(
+                    '[系统] 用户 {}({}) 离开了此频道'.format(data['username'], address[0])))
 
             main.ui.textBrowser.ensureCursorVisible()
 
     # Windows 10 消息
     def sendWindowsMessage(self, title, message):
         try:
-            toaster.show_toast(title, message, icon_path="logo.ico", threaded = True, duration = None)
+            toaster.show_toast(title, message, icon_path="logo.ico", threaded=True, duration=None)
         except:
             print("[警告] 发送 Windows 消息出错")
+
 
 # win10 通知出错时提示的窗口
 class MsgNotice(QWidget):
@@ -317,10 +345,12 @@ class MsgNotice(QWidget):
         self.ui = QUiLoader().load('style/MsgNotice.ui')
         self.ui.setWindowTitle("关于 冰氏局域网去中心化聊天系统")
 
+
 # 文件传输服务
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory='cache', **kwargs)
+
 
 class fileHttp:
     def __init__(self):
@@ -331,6 +361,7 @@ class fileHttp:
     def run(self):
         self.server_obj = ThreadingHTTPServer(('', config.config['common'].getint('file_port')), Handler)
         self.server_obj.serve_forever()
+
 
 # 底部提示框
 class StatusBar:
@@ -347,11 +378,13 @@ class StatusBar:
                 self.statusbar.showMessage(self.status.pop(0))
                 time.sleep(7)
             else:
-                self.statusbar.showMessage("你当前使用昵称 {} 位于 {} 频道".format(yamlConfig.getConfig()['username'], nowChatChannel))
+                self.statusbar.showMessage(
+                    "你当前使用昵称 {} 位于 {} 频道".format(yamlConfig.getConfig()['username'], nowChatChannel))
             time.sleep(0.5)
 
     def addStatus(self, status):
         self.status.append(status)
+
 
 # TODO 管理员：软件更新、禁言、强制关闭软件
 
