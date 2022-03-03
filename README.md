@@ -28,3 +28,9 @@ win10toast-click==0.1.2
 - 主程序：`BingLocalNetChatClient.py`
 - 编译脚本：`build.cmd`
 - 安装程序配置：`setup/BingLocalNetChat.iss`
+
+## 思维导图
+
+### 传输频道思维导图
+
+![传输频道思维导图](https://www.yistars.cn/Bing/special/BingLocalChat/Img/InfoChannel.svg)
