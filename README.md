@@ -33,4 +33,5 @@ win10toast-click==0.1.2
 
 ### 传输频道思维导图
 
-![传输频道思维导图](https://www.yistars.cn/Bing/special/BingLocalChat/Img/InfoChannel.svg)
+[查看完整矢量图](https://www.yistars.cn/Bing/special/BingLocalChat/Img/InfoChannel.svg)
+![传输频道思维导图](https://www.yistars.cn/Bing/special/BingLocalChat/Img/InfoChannel.png)
